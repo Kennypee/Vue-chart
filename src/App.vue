@@ -1,7 +1,6 @@
 <template>
   <div class="small">
     <line-chart :chart-data="datacollection" id="mychart"></line-chart>
-    <button @click="fillData()">Randomize</button>
   </div>
 </template>
 
@@ -11,7 +10,6 @@ import io from "socket.io-client";
 var socket = io.connect("http://localhost:4000");
 
 export default {
-
   components: {
     LineChart
   },
@@ -21,42 +19,38 @@ export default {
       chartvalues:null
     };
   },
-  mounted() {
-    this.fillData();
+  created() {
+    this.getRealtimeData()
   },
   methods: {
-    fillData() {
+    fillData(fetchedData) {
       this.datacollection = {
-        labels: [this.getRealtimeData(), this.getRealtimeData()],
+        labels: [this.getRandomChartValues(fetchedData), this.getRandomChartValues(fetchedData)],
         datasets: [
           {
-            label: "Data One",
-            backgroundColor: "#f87979",
-            data: [this.getRealtimeData(),this.getRealtimeData()]
+            label: "Google Stock",
+            backgroundColor: "#1A73E8",
+            data: [this.getRandomChartValues(fetchedData), this.getRandomChartValues(fetchedData)]
           },
           {
-            label: "Data Two",
-            backgroundColor: "#f87",
-            data: [this.getRealtimeData(),this.getRealtimeData()]
-          }
+            label: "Microsoft Stock",
+            backgroundColor: "#2b7518",
+            data: [this.getRandomChartValues(fetchedData), this.getRandomChartValues(fetchedData)]          }
         ]
       };
     },
     getRealtimeData() {
-      var value = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
-      socket.emit("update", value);
-      socket.on("newdata", data => {
-        //trying to return data here when the getRealtimeData()
-        //fumction is called to update the chart values in realtime
-        console.log(data)
-        this.chartvalues = data
-        });
-      //  return this.chartvalues ---- this returns null
-       return value
+      socket.on("newdata", fetchedData => {
+        this.fillData(fetchedData) 
+      })
+    },
+    getRandomChartValues(number){
+      return Math.floor(Math.random() * number)
     }
   }
 
 };
+
 </script>
 
 <style>

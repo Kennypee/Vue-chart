@@ -8,10 +8,14 @@ const server = app.listen(`${port}`, function() {
 });
 const io = require("socket.io")(server);
 
-io.on("connection", socket => {
-  socket.on("update", data => {
-    socket.broadcast.emit("newdata", data);
-    console.log(data);
-  });
-});
+function getRandomValue(){
+    return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+}
+    io.on("connection", socket => {
+        setInterval(() => {
+            socket.broadcast.emit("newdata", getRandomValue())
+        }, 7000)
+        
+      });
+
 
